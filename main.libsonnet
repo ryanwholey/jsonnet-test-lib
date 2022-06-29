@@ -1,5 +1,9 @@
+local k = import 'lib/k.libsonnet';
+
 {
-  '#':: d.pkg(name='t', url='github.com/ryanwholey/jsonnet-test-lib/main.libsonnet', help='Testing out a remote Jsonnet lib'),
-  hello(name)::
-    "hello %s" % name
+  deployment(name)::
+    k.apps.v1.deployment.new(name=name, containers=[
+      k.core.v1.container.new(name=name, image=name)
+    ])
+  ,
 }
