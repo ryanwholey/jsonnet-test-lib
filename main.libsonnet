@@ -1,21 +1,28 @@
 local k = import 'lib/k.libsonnet';
 
 {
-  deployment(name, image)::
-    k.apps.v1.deployment.new(name=name, containers=[
-      k.core.v1.container.new(name=name, image=image)
-    ])
+  deployment(name, image, port, replicas)::
+    local container = k.core.v1.container;
+    local deployment = k.apps.v1.deployment;
+    deployment.new(name=name, containers=[
+      (
+        container.new(name=name, image=image) +
+        container.withPorts(
+          k.core.v1.containerPort.new(port)
+        )
+      )
+    ]) +
+    deployment.spec.withReplicas(replicas)
   ,
-  service(name, ports):
-    k.core.v1.service.new(name=name, ports=ports, selector='name: app')
-  ,
-  apiServer(environment)::
-    "http://192.168.64.25:8443"
-  ,
-  manifest(config)::
-    k.apps.v1.deployment.new(name=config.name, containers=[
-      k.core.v1.container.new(name=config.name, image=config.image)
-    ],) 
+  service(name, port):
+    local service = k.core.v1.service;
+    local servicePort = k.core.v1.servicePort;
+
+    service.new(
+      name=name,
+      ports=[ servicePort.newNamed("http", port, port) ],
+      selector={ name: "app", },
+    )
   ,
   spec(apiServer, environment, config)::
     {
@@ -29,8 +36,8 @@ local k = import 'lib/k.libsonnet';
         namespace: config.namespace
       },
       data: {
-        deployment: $.deployment(config.name, config.image),
-        service: $.service(config.name, config.image),
+        deployment: $.deployment(config.name, config.image, config.port, config.replicas),
+        service: $.service(config.name, config.port),
       },
     }
 }
