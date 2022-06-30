@@ -24,7 +24,7 @@ local k = import 'lib/k.libsonnet';
       selector={ name: name, },
     )
   ,
-  spec(apiServer, environment, config)::
+  render(apiServer, environment, config)::
     {
       apiVersion: 'tanka.dev/v1alpha1',
       kind: 'Environment',
