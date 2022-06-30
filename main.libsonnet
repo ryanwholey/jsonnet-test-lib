@@ -21,7 +21,7 @@ local k = import 'lib/k.libsonnet';
     service.new(
       name=name,
       ports=[ servicePort.newNamed("http", port, port) ],
-      selector={ name: "app", },
+      selector={ name: name, },
     )
   ,
   spec(apiServer, environment, config)::
