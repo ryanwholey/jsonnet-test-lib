@@ -11,4 +11,20 @@ local k = import 'lib/k.libsonnet';
     k.apps.v1.deployment.new(name=config.name, containers=[
       k.core.v1.container.new(name=config.name, image=config.image)
     ],) 
+  ,spec(apiServer, environment, config)::
+    {
+      apiVersion: 'tanka.dev/v1alpha1',
+      kind: 'Environment',
+      metadata: {
+        name: 'default'
+      },
+      spec: {
+        apiServer: apiServer,
+        namespace: namespace
+      },
+      data: 
+        k.apps.v1.deployment.new(name=config.name, containers=[
+          k.core.v1.container.new(name=config.name, image=config.image)
+        ],) 
+    }
 }
